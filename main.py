@@ -25,7 +25,7 @@ class SnakesAndLadders:
         return (False,None)
         
     def check_cut(self,mover_id,dice_roll_number):
-        for i in range(1,4):
+        for i in range(1,self.players+1):
             if i != mover_id:
                 player_position = self.get_player_position(i)
                 if player_position == self.get_player_position(mover_id) + dice_roll_number:
@@ -66,24 +66,36 @@ class SnakesAndLadders:
             self.dice_roll_history[player_id].append(dice_roll_number)
 
         return 
-        
+    
+    def modify_player_history(self,player_id):
+        for idx,pos in enumerate(self.position_history[player_id]):
+            if pos!=0:
+                row = (pos-1)//self.grid_size
+                col = (pos-1)%self.grid_size
+                if row%2 == 1:
+                    col = (self.grid_size - col -1 )%self.grid_size
+                self.position_history[player_id][idx] = (col,row)
+            else:
+                self.position_history[player_id][idx] = (-1,-1)
         
     
     def simulate_gameplay(self):
         i = 1
         while not self.game_finished:
-            player_id = i%3
+            player_id = i%self.players
             if player_id == 0:
-                player_id = 3
+                player_id = self.players
             self.dice_roll(player_id)
             i += 1
-        for j in range(1,4):
+        for j in range(1,self.players+1):
             print(f"Player {j}")
             print("dice roll history",self.dice_roll_history[j])
-            print("position history",self.position_history[j])
+            print("position history before modification",self.position_history[j])
+            self.modify_player_history(j)
+            print("position history after modification",self.position_history[j])
         
     
-snl = SnakesAndLadders(grid_size=4)
+snl = SnakesAndLadders(grid_size=3)
 print(snl.simulate_gameplay())
 
 
